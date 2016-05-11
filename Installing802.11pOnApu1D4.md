@@ -14,7 +14,9 @@ The steps to install an 802.11p device in the APU 1D4 are:
  5. Setting up the interface for startup configuration.
 
 ## The hardware
+
 ### The board
+
 We decided to buy a APU 1D4 board from [pccengines](http://pcengines.com). The characteristics of this board are:
 
  - CPU: AMD G series T40E, 1 GHz dual Bobcat core with 64 bit support, 32K data + 32K instruction + 512K L2 cache per core
@@ -24,12 +26,17 @@ We decided to buy a APU 1D4 board from [pccengines](http://pcengines.com). The c
  - Connectivity: 3 Gigabit Ethernet channels (Realtek RTL8111E)
  - I/O: DB9 serial port, 2 USB external + 2 internal, three front panel LEDs, pushbutton
  - Expansion: 2 miniPCI express (one with SIM socket), LPC bus, GPIO header, I2C bus, COM2 (3.3V RXD / TXD) 
+
 The key points to chose this board were the amount of RAM, the mini PCIe connector, and the m-Sata interface.
 
 This board allows us to install Debian on it and it is able to run java and i386 binaries.
+
 ### The wireless interface
+
 The most important module in our configuration is the wireless card. We bought a "802.11 a/b/g/n miniPCI express radio" this card has a 	Qualcomm Atheros AR9280 chipset supported by the driver ath9k. This driver is well known to support 5.9Ghz and OCB operations.
+
 ### Shopping list
+
 The final component list is:
 From [PcEngines](http://pcengines.com)
  - APU.1D4 system board 4GB	EUR 115.02
@@ -39,9 +46,13 @@ From [PcEngines](http://pcengines.com)
  - Compex WLE200NX miniPCI express card	EUR 16.68
 From [Hobbitronics](http://www.hobbytronics.co.uk/gps-gp-20u7)
  - GP20u7 GPS Receiver EUR 15.96
+
 ## Installing Debian
+
 Installing Debian in the Apu board is quite simple. First we need to use a serial cable to connect a computer with the board and get a terminal, then we only need to install Debian from a usb stick as we would install it in any other computer.
+
 ### Serial connection to the board
+
 To connect with the APU board we need a null-modem cable. A null-modem cable is a DB9 serial cable whose pins 2-3 have been crossed. There are USB-DB9 cables you can use if your computer does not have a DB9 port.
 Once the board is connected to your computer you can open a terminal using minicom and the following configuration:
     
@@ -54,7 +65,9 @@ Once the board is connected to your computer you can open a terminal using minic
     G - Software Flow Control : No
 
 ### Creating a Debian USB Installation Stick
+
 The installation process assumes that the APU1D4 is connected to the Internet through the eth0 (the closest to the serial port) interface.
+
 1. Download the last Debian Image from [lisovy's github repository](https://github.com/ssinyagin/pcengines-apu-debian-cd). 
 2. Write to an USB stick using dd:
 `dd if=/path/image.iso of=/dev/sdb`
@@ -70,7 +83,9 @@ The installation process assumes that the APU1D4 is connected to the Internet th
 
 Now the board is ready to install the 802.11p drivers and applications. Next
 sections follow this [manual](https://gist.github.com/lisovy/80dde5a792e774a706a9).
+
 ## Installing 802.11p linux kernel
+
 To install a 802.11p kernel follow these steps:
 1. Git clone [this repository](https://github.com/CTU-IIG/802.11p-linux.git).
     
@@ -91,32 +106,30 @@ To install a 802.11p kernel follow these steps:
     
 5. Configure your kernel, be sure enable MAC80211_*_DEBUG options:
 
-   $make 0=_build oldconfig # Update the oldconfig
-   $make 0=_build menuconfig # Configure your kernel
-   $grep MAC80211_.*_DEBUG < .config # Check MAC80211_*_DEBUG configuration.
-   CONFIG_MAC80211_VERBOSE_DEBUG=y
-   CONFIG_MAC80211_MLME_DEBUG=y
-   CONFIG_MAC80211_STA_DEBUG=y
-   CONFIG_MAC80211_HT_DEBUG=y
-   CONFIG_MAC80211_OCB_DEBUG=y
-   CONFIG_MAC80211_IBSS_DEBUG=y
-   CONFIG_MAC80211_PS_DEBUG=y
-   CONFIG_MAC80211_MPL_DEBUG=y
-   CONFIG_MAC80211_MPATH_DEBUG=y
-   CONFIG_MAC80211_MHWMP_DEBUG=y
-   CONFIG_MAC80211_MESH_SYNC_DEBUG=y
-   CONFIG_MAC80211_MESH_CSA_DEBUG=y
-   CONFIG_MAC80211_MESH_PS_DEBUG=y
-   CONFIG_MAC80211_TDLS_DEBUG=y
-
+    $make 0=_build oldconfig # Update the oldconfig
+    $make 0=_build menuconfig # Configure your kernel
+    $grep MAC80211_.*_DEBUG < .config # Check MAC80211_*_DEBUG configuration.
+    CONFIG_MAC80211_VERBOSE_DEBUG=y
+    CONFIG_MAC80211_MLME_DEBUG=y
+    CONFIG_MAC80211_STA_DEBUG=y
+    CONFIG_MAC80211_HT_DEBUG=y
+    CONFIG_MAC80211_OCB_DEBUG=y
+    CONFIG_MAC80211_IBSS_DEBUG=y
+    CONFIG_MAC80211_PS_DEBUG=y
+    CONFIG_MAC80211_MPL_DEBUG=y
+    CONFIG_MAC80211_MPATH_DEBUG=y
+    CONFIG_MAC80211_MHWMP_DEBUG=y
+    CONFIG_MAC80211_MESH_SYNC_DEBUG=y
+    CONFIG_MAC80211_MESH_CSA_DEBUG=y
+    CONFIG_MAC80211_MESH_PS_DEBUG=y
+    CONFIG_MAC80211_TDLS_DEBUG=y 
 
 6. Generate debian kernel packages:
 
-   $make deb-pkg # Compile the kernel and generate Debian packages 
+    $make deb-pkg # Compile the kernel and generate Debian packages 
 
 7. Install the new kernel
 
-   #
 ## Installing Iw
 ## Installing the Regulatory Database
 ## Configuring interfaces
