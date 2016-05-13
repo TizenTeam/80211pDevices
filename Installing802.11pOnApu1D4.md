@@ -277,8 +277,57 @@ pre-up iw dev wlan0 set type ocb
 post-up iw dev wlan0 ocb join 5900 10MHZ
 ```
 
-Restart your system now and check the state of your interface.
+Restart your system now and check the status of your interface.
 
-1. 
+1. Check the low level configuration and be sure 5.9 Ghz channels are enabled.
 
-## Installing the GeoNetworking Stack
+```
+# iw phy0 info
+Wiphy phy0
+[....]
+                        * 5855 MHz [171] (disabled)
+                        * 5860 MHz [172] (20.0 dBm) (no IR)
+                        * 5865 MHz [173] (20.0 dBm) (no IR)
+                        * 5870 MHz [174] (20.0 dBm) (no IR)
+                        * 5875 MHz [175] (20.0 dBm) (no IR)
+                        * 5880 MHz [176] (20.0 dBm) (no IR)
+                        * 5885 MHz [177] (20.0 dBm) (no IR)
+                        * 5890 MHz [178] (20.0 dBm) (no IR)
+                        * 5895 MHz [179] (20.0 dBm) (no IR)
+                        * 5900 MHz [180] (20.0 dBm) (no IR)
+                        * 5905 MHz [181] (20.0 dBm) (no IR)
+                        * 5910 MHz [182] (20.0 dBm) (no IR)
+                        * 5915 MHz [183] (20.0 dBm) (no IR)
+                        * 5920 MHz [184] (disabled)
+                        * 5925 MHz [185] (disabled)
+[....]
+```
+
+2. Check the wlan0 status
+```
+# iw wlan0 info
+Interface wlan0
+        ifindex 5
+        wdev 0x1
+        addr 04:f0:21:1e:48:05
+        type outside context of a BSS
+        wiphy 0
+        channel 180 (5900 MHz), width: unknown, center1: 5900 MHz
+```
+
+## Next Steps
+
+Now we can use the IP stack to check the performance of our new 802.11p nic.
+In the case we want to install a ITS-G5 stack we can follow this 
+[document](http://gcdc.net/images/doc/REP.GN-with-OpenVPN.pdf) from the GCDC 
+project.
+
+## Resources
+
+* https://gist.github.com/lisovy/80dde5a792e774a706a9
+* https://github.com/ssinyagin/pcengines-apu-debian-cd
+* http://gcdc.net/images/doc/REP.GN-with-OpenVPN.pdf
+* http://gcdc.net/images/doc/REP.802.11p-on-APU1D.pdf
+* http://gcdc.net/en/teams/rules-and-technology
+
+
