@@ -77,7 +77,10 @@ The installation process assumes that the APU1D4 is connected to the Internet th
 6. Log in `user:root password:pcengines` 
 7. Install the following packages:
     
-    #apt-get install git build-essential  libncurses-dev sharutils pkg-config
+    ```
+    #apt-get install git build-essential libncurses-dev sharutils pkg-config \\
+    libnl-dev libnl-genl-3-dev python-dev python-pip python-m2crypto libgcrypt11-dev
+    ```
     
 8. Now you have a Debian system.
 
@@ -87,25 +90,28 @@ sections follow this [manual](https://gist.github.com/lisovy/80dde5a792e774a706a
 ## Installing 802.11p linux kernel
 
 To install a 802.11p kernel follow these steps:
-1. Git clone [this repository](https://github.com/CTU-IIG/802.11p-linux.git).
+1. Git clone [this repository](https://github.com/GRCDEV/802.11p-linux.git).
     
-    git clone https://github.com/CTU-IIG/802.11p-linux.git
+    `git clone https://github.com/CTU-IIG/802.11p-linux.git`
 
 2. Cd into the directory and checkout the `its-g5_v3` branch
 
-    $cd 802.11p-linux
-    $git checkout its-g5_v3
+```
+$cd 802.11p-linux
+$git checkout its-g5_v3
+```
     
 3. Create a new directory for the build
     
-    $mkdir _build
+    `$mkdir _build`
 
 4. Copy the current kernel configuration included with your Debian:
     
-    $cp cp /boot/config-3.16.0-4-amd64 .config
+    `$cp cp /boot/config-3.16.0-4-amd64 .config`
     
 5. Configure your kernel, be sure enable MAC80211_*_DEBUG options:
 
+    ```
     $make 0=_build oldconfig # Update the oldconfig
     $make 0=_build menuconfig # Configure your kernel
     $grep MAC80211_.*_DEBUG < .config # Check MAC80211_*_DEBUG configuration.
@@ -123,14 +129,156 @@ To install a 802.11p kernel follow these steps:
     CONFIG_MAC80211_MESH_CSA_DEBUG=y
     CONFIG_MAC80211_MESH_PS_DEBUG=y
     CONFIG_MAC80211_TDLS_DEBUG=y 
-
+    ```
+    
 6. Generate debian kernel packages:
 
-    $make deb-pkg # Compile the kernel and generate Debian packages 
+    `$make deb-pkg # Compile the kernel and generate Debian packages`
 
 7. Install the new kernel
 
+    ```
+    # ls ../*.deb
+    ../linux-firmware-image-3.18.0+_3.18.0+-1_amd64.deb
+    ../linux-headers-3.18.0+_3.18.0+-1_amd64.deb
+    ../linux-image-3.18.0+_3.18.0+-1_amd64.deb
+    ../linux-image-3.18.0+-dbg_3.18.0+-1_amd64.deb
+    ../linux-libc-dev_3.18.0+-1_amd64.deb
+    # for i in ../*.deb; do dpkg --install $i; done
+    ```
+
+Now you are ready to install userspace tools to use the new features in your
+kernel.
+
 ## Installing Iw
+To install `iw` follow these steps:
+
+1. Clone the [iw repository](https://github.com/CTU-IIG/802.11p-iw.git)
+
+    ```
+    git clone https://github.com/CTU-IIG/802.11p-iw.git
+    ```
+
+2. Get into the directory and checkout the its-g5_v3 branch 
+
+    ```
+    $cd 802.11p-iw
+    $checkout its-g5_v3
+    ```
+    
+3. There is a bug on the iw Makefile we need to fix:
+
+    ```
+    #Replace 
+    $(Q)$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o iw
+    #With
+    $(Q)$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -I /usr/include/libnl3 -o iw
+    ```
+
+3. Build and install it
+
+    ```
+    $make
+    $sudo make install
+    ```
+
+4. Test it
+
+    ```
+    $iw |grep -i ocb
+    dev <devname> ocb join <freq in MHz> <5MHZ|10MHZ>
+    dev <devname> ocb leave
+    ```
+
 ## Installing the Regulatory Database
+
+Now it is time to install a new regulatory database so we can configure our
+wireless device in OCB mode and tune it at 5.9Ghz. To install the new regulatory
+database follow these steps:
+
+1. Clone the [802.11p-wireless-regdb](802.11p-wireless-regdb) repository in your
+working directory.
+
+    `git clone https://github.com/CTU-IIG/802.11p-wireless-regdb.git`
+
+2. Get into it and checkout the branch its-g5_v3
+
+    ```
+    $cd 802.11p-wireless-regdb
+    $git checkout its-g5_v3
+    ```
+
+3. Change the db.txt file to copy the OCB line into your country section which
+is originally included only for Germany.
+
+    ```
+    #For ITS-G5 evaluation
+    (5850 – 5925 @ 20), (100 mW), NO-CCK, OCB-ONLY
+    ```
+
+4. Build it and install it.
+
+    ```
+    $make
+    $sudo make install
+    ```
+
+5. Go back to your working directory and clone [this repository](https://github.com/CTU-IIG/802.11p-crda.git)
+    
+    ```
+    $cd ..
+    $git clone https://github.com/CTU-IIG/802.11p-crda.git
+    ```
+
+6. Checkout the `its-g5_v1` branch.
+
+    `git checkout its-g5_v1`
+
+7. Copy your recently created pubkey to the pubkeys directory.
+
+    `# cp /usr/lib/crda/pubkeys/root.key.pub.pem pubkeys/`
+
+8. Build it and install it
+
+```
+    $make
+    $make install
+```
+
+9. Check your regulatory configuration.
+
+```
+$regdbdump /usr/lib/crda/regulatory.bin | less
+country ES: DFS-ETSI
+        (2400.000 - 2483.500 @ 40.000), (20.00)
+        (5150.000 - 5250.000 @ 80.000), (20.00), NO-OUTDOOR
+        (5250.000 - 5350.000 @ 80.000), (20.00), NO-OUTDOOR
+        (5470.000 - 5725.000 @ 80.000), (26.98), DFS
+        (5850.000 - 5925.000 @ 20.000), (20.00), NO-CCK, OCB-ONLY
+        (57240.000 - 65880.000 @ 2160.000), (40.00), NO-OUTDOOR
+```
+
 ## Configuring interfaces
+Now we can configure our interface so it will be configured at startup time.
+Edit the `/etc/network/interfaces` file and add an entry for your wireless
+interface (`wlan0` in our case) like this.
+
+```
+# JdJ20151204: OCB entry (802.11p)
+auto wlan0
+iface wlan0 inet static
+address 192.168.97.101
+# replace with your IPv4 address
+netmask 255.255.255.0
+broadcast 192.168.97.255
+pre-up iw reg set ES
+# replace with your CC
+pre-up iw dev wlan0 set type ocb
+post-up iw dev wlan0 ocb join 5900 10MHZ
+```
+
+Restart your system now and check the state of your interface.
+
+1. 
+
 ## Installing the GeoNetworking Stack
