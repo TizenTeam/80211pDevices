@@ -2,7 +2,9 @@
 
 
 # Installing 802.11p on APU 1D4
-##Introduction
+
+## Introduction
+
 In this document we describe how to get 802.11p device on the APU 1D4 board.
 The steps to install an 802.11p device in the APU 1D4 are:
 
@@ -17,7 +19,7 @@ The steps to install an 802.11p device in the APU 1D4 are:
 
 ### The board
 
-We decided to buy a APU 1D4 board from [pccengines](http://pcengines.com). The characteristics of this board are:
+We decided to buy a APU 1D4 board from [pccengines](http://pcengines.ch). The characteristics of this board are:
 
  - CPU: AMD G series T40E, 1 GHz dual Bobcat core with 64 bit support, 32K data + 32K instruction + 512K L2 cache per core
  - DRAM: 2 or 4 GB DDR3-1066 DRAM
@@ -35,6 +37,8 @@ This board allows us to install Debian on it and it is able to run java and i386
 
 The most important module in our configuration is the wireless card. We bought a "802.11 a/b/g/n miniPCI express radio" this card has a 	Qualcomm Atheros AR9280 chipset supported by the driver ath9k. This driver is well known to support 5.9Ghz and OCB operations.
 
+* https://pcengines.ch/wle200nx.htm
+
 ### Shopping list
 
 The final component list is:
@@ -44,8 +48,9 @@ From [PcEngines](http://pcengines.com)
  - AC adapter 12V 2A euro for IT equipment	EUR 3.86
  - SSD M-Sata 16GB MLC Phison	EUR 14.93
  - Compex WLE200NX miniPCI express card	EUR 16.68
-From [Hobbitronics](http://www.hobbytronics.co.uk/gps-gp-20u7)
+   From [Amazon](https://www.amazon.com/exec/obidos/ASIN/B00527XI28/rzr)
  - GP20u7 GPS Receiver EUR 15.96
+   From [Hobbitronics](http://www.hobbytronics.co.uk/gps-gp-20u7)
 
 ## Installing Debian
 
